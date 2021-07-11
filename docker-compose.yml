@@ -1,0 +1,24 @@
+version: '3.8'
+
+networks:
+  exchange-rate-grabber-python:
+
+services:
+  redis:
+    build: ./redis
+    container_name: redis
+    command: redis-server --requirepass ${GRABBER_REDIS_PASSWORD}
+    ports:
+      - 6380:${GRABBER_REDIS_PORT}
+    networks:
+      - exchange-rate-grabber-python
+  cron:
+    build:
+      context: .
+      dockerfile: ./cron/Dockerfile
+    container_name: cron
+    volumes:
+      - ./exchange-rate-grabber-python:/exchange-rate-grabber-python
+    working_dir: /exchange-rate-grabber-python
+    networks:
+      - exchange-rate-grabber-python
